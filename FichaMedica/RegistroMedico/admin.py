@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import AntecedenteEnfermedades, EstudiosMedico, RegistroMedico
+from .models import *
 
 # Registro de AntecedenteEnfermedades en el admin
 @admin.register(AntecedenteEnfermedades)
@@ -36,4 +36,40 @@ class EstudioMedicoAdmin(admin.ModelAdmin):
         return "No disponible"
     archivo_link.short_description = 'Archivo'
 
-   
+
+@admin.register(ElectroBasal)
+class ElectroBasalAdmin(admin.ModelAdmin):
+    list_display = ('idelectro_basal', 'ritmo', 'PQ', 'frecuencia', 'arritmias', 'ejeQRS', 'trazadoNormal', 'idfichaMedica')
+    search_fields = ('ritmo', 'PQ', 'frecuencia')
+    list_filter = ('ritmo', 'trazadoNormal')
+    ordering = ('idelectro_basal',)
+
+@admin.register(ElectroEsfuerzo)
+class ElectroEsfuerzoAdmin(admin.ModelAdmin):
+    list_display = ('idelectro_esfuerzo', 'observaciones', 'idfichaMedica')
+    search_fields = ('observaciones',)
+    ordering = ('idelectro_esfuerzo',)
+
+@admin.register(Cardiovascular)
+class CardiovascularAdmin(admin.ModelAdmin):
+    list_display = ('idcardiovascular', 'Auscultación', 'soplos', 'R1', 'tensionArterial', 'R2', 'ruidosAgregados', 'idfichaMedica')
+    search_fields = ('Auscultación', 'soplos', 'tensionArterial')
+    ordering = ('idcardiovascular',)
+
+@admin.register(Laboratorio)
+class LaboratorioAdmin(admin.ModelAdmin):
+    list_display = ('idlaboratorio', 'citologico', 'orina', 'colesterol', 'uremia', 'glucemia', 'otros', 'idfichaMedica')
+    search_fields = ('citologico', 'orina', 'colesterol')
+    ordering = ('idlaboratorio',)
+
+@admin.register(Torax)
+class ToraxAdmin(admin.ModelAdmin):
+    list_display = ('idtorax', 'observaciones', 'idfichaMedica')
+    search_fields = ('observaciones',)
+    ordering = ('idtorax',)
+
+@admin.register(Oftalmologico)
+class OftalmologicoAdmin(admin.ModelAdmin):
+    list_display = ('idoftalmologico', 'od', 'oi', 'ficha_medica')
+    search_fields = ('od', 'oi')
+    ordering = ('idoftalmologico',) 

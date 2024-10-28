@@ -15,11 +15,11 @@ class Profile(models.Model):
     rol = models.CharField(
         max_length=20,
         choices=[
-            ('general', 'General'),
+            ('jugador', 'Jugador'),  # Valor predeterminado actualizado a "jugador"
             ('medico', 'Médico'),
             ('representante', 'Representante'),
         ],
-        default='general'
+        default='jugador'
     )
 
     class Meta:
@@ -27,4 +27,3 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} - {self.rol}"
-

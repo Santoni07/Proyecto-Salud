@@ -96,3 +96,139 @@ def eliminar_archivo_post_delete(sender, instance, **kwargs):
     if instance.archivo:
         if os.path.isfile(instance.archivo.path):
             os.remove(instance.archivo.path)
+
+
+
+class ElectroBasal(models.Model):
+    idelectro_basal = models.AutoField(primary_key=True)
+    ritmo = models.CharField(max_length=45, null=True, blank=True)
+    PQ = models.CharField(max_length=45, null=True, blank=True)
+    frecuencia = models.CharField(max_length=45, null=True, blank=True)
+    arritmias = models.CharField(max_length=45, null=True, blank=True)
+    ejeQRS = models.CharField(max_length=45, null=True, blank=True)
+    trazadoNormal = models.CharField(max_length=45, null=True, blank=True)
+    observaciones = models.CharField(max_length=45, null=True, blank=True)
+    
+    # Relación con el modelo RegistroMedico, renombrada a ficha_medica
+    ficha_medica = models.OneToOneField(
+        RegistroMedico, 
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    class Meta:
+        db_table = 'electro_basal'
+        verbose_name = 'Electro Basal'
+        verbose_name_plural = 'Electro Basales'
+
+    def __str__(self):
+        return f"Electro Basal {self.idelectro_basal} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+
+class ElectroEsfuerzo(models.Model):
+    idelectro_esfuerzo = models.AutoField(primary_key=True)
+    observaciones = models.CharField(max_length=200, null=True, blank=True)
+    
+    # Relación con el modelo RegistroMedico, renombrada a ficha_medica
+    ficha_medica = models.OneToOneField(
+        RegistroMedico,
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    class Meta:
+        db_table = 'electro_esfuerzo'
+        verbose_name = 'Electro Esfuerzo'
+        verbose_name_plural = 'Electro Esfuerzos'
+
+    def __str__(self):
+        return f"Electro Esfuerzo {self.idelectro_esfuerzo} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+    
+    
+class Cardiovascular(models.Model):
+    idcardiovascular = models.AutoField(primary_key=True)
+    auscultacion = models.CharField(max_length=45, null=True, blank=True)
+    soplos = models.CharField(max_length=45, null=True, blank=True)
+    R1 = models.CharField(max_length=45, null=True, blank=True)
+    tension_arterial = models.CharField(max_length=45, null=True, blank=True)
+    R2 = models.CharField(max_length=45, null=True, blank=True)
+    observaciones = models.CharField(max_length=200, null=True, blank=True)
+    ruidos_agregados = models.CharField(max_length=45, null=True, blank=True)
+    
+    # Relación con el modelo RegistroMedico, renombrada a ficha_medica
+    ficha_medica = models.OneToOneField(
+        RegistroMedico,
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    class Meta:
+        db_table = 'cardiovascular'
+        verbose_name = 'Examen Cardiovascular'
+        verbose_name_plural = 'Exámenes Cardiovasculares'
+
+    def __str__(self):
+        return f"Cardiovascular {self.idcardiovascular} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+    
+class Laboratorio(models.Model):
+    idlaboratorio = models.AutoField(primary_key=True)
+    citologico = models.CharField(max_length=45, null=True, blank=True)
+    orina = models.CharField(max_length=45, null=True, blank=True)
+    colesterol = models.CharField(max_length=45, null=True, blank=True)
+    uremia = models.CharField(max_length=45, null=True, blank=True)
+    glucemia = models.CharField(max_length=45, null=True, blank=True)
+    otros = models.CharField(max_length=45, null=True, blank=True)
+    
+    # Relación con el modelo RegistroMedico, renombrada a ficha_medica
+    ficha_medica = models.OneToOneField(
+        RegistroMedico,
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    class Meta:
+        db_table = 'laboratorio'
+        verbose_name = 'Examen de Laboratorio'
+        verbose_name_plural = 'Exámenes de Laboratorio'
+
+    def __str__(self):
+        return f"Laboratorio {self.idlaboratorio} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+    
+class Torax(models.Model):
+    idtorax = models.AutoField(primary_key=True)
+    observaciones = models.CharField(max_length=200, null=True, blank=True)
+    
+    # Relación con el modelo RegistroMedico, renombrada a ficha_medica
+    ficha_medica = models.OneToOneField(
+        RegistroMedico,
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    class Meta:
+        db_table = 'torax'
+        verbose_name = 'Examen de Tórax'
+        verbose_name_plural = 'Exámenes de Tórax'
+
+    def __str__(self):
+        return f"Tórax {self.idtorax} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+    
+
+class Oftalmologico(models.Model):
+    idoftalmologico = models.AutoField(primary_key=True)
+    od = models.CharField(max_length=45, null=True, blank=True)  # Ojo derecho
+    oi = models.CharField(max_length=45, null=True, blank=True)  # Ojo izquierdo
+
+    # Relación con el modelo RegistroMedico, renombrada a ficha_medica
+    ficha_medica = models.OneToOneField(
+        RegistroMedico,
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    class Meta:
+        db_table = 'oftalmologico'
+        verbose_name = 'Examen Oftalmológico'
+        verbose_name_plural = 'Exámenes Oftalmológicos'
+
+    def __str__(self):
+        return f"Oftalmológico {self.idoftalmologico} - Ficha Médica {self.ficha_medica.idfichaMedica}"
