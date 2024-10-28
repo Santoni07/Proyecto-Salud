@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+<br>
+<br>
+{% block title %}Cerrar Sesion{% endblock %}
+{% block content %}
+    <div class="column is-three-quarters">
+        <h1>Cerrar Sesion</h1>
+        <p>
+            Has cerrado sesion exitosamente
+            Puedes volverte a loguear <a href="{% url 'login' %}">Aqui</a>
+        </p>
+    </div>
+{% endblock %}

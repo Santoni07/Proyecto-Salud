@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Salud - Aptos Físicos{% endblock %}
+{% block content %}
+
+<!-- Hero Section -->
+<section id="hero" class="hero  section dark-background">
+    <img src="{% static 'core/img/medico_home.jpg' %}" alt="Medico Home" class="hero-img">
+
+    <div class="container text-center">
+        <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+                <h2>Aptos Físicos Online</h2>
+                <p>Gestiona de manera sencilla y rápida tus exámenes médicos para torneos de fútbol. Los jugadores pueden cargar sus datos y antecedentes, y los médicos realizarán la aprobación del apto físico de forma online.</p>
+                <a href="" class="btn-get-started">Registrate</a>
+                <a href="{% url 'login' %}" class="btn-get-started">Inicia Sesión</a>
+            </div>
+        </div>
+    </div>
+</section><!-- End Hero Section -->
+{% endblock %}
+
+{% block publicidad %}
+<!-- Publicidades Section -->
+<section id="publicidades" class="publicidades section light-background">
+    <div class="container">
+        <!-- Contenedor de Publicidades con Flexbox -->
+        <div class="publicidad-wrapper" style="display: flex; justify-content: space-between; gap: 20px;">
+            {% for publicidad in publicidades %}
+            <div class="publicidad-item" style="flex: 1; text-align: center;">
+                <img src="{{ publicidad.imagen.url }}" alt="{{ publicidad.titulo }}" class="publicidad-img" style="width: 300px; height: 300px;">
+                <h3>{{ publicidad.titulo }}</h3>
+                <p>{{ publicidad.descripcion }}</p>
+                {% if publicidad.url %}
+                <a href="{{ publicidad.url }}">Ver más</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section><!-- End Publicidades Section -->
+{% endblock %}

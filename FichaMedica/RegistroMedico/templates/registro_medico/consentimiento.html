@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Consentimiento</h3>
+                    <p class="text-justify">El que suscribe <strong class="font-size-lg">{{ profile.nombre }} {{ profile.apellido }}</strong> con D.N.I <strong class="font-size-lg">{{ profile.dni }}</strong>,</p>
+                    
+                    {% for categoria_equipo in categorias_equipo %}
+                        <p class="text-justify">
+                            Acepto integrar el equipo <strong class="font-size-lg">{{ categoria_equipo.categoria_equipo.equipo.nombre }}</strong> que participará en el torneo <strong class="font-size-lg">{{ categoria_equipo.categoria_equipo.categoria.torneo }}</strong> bajo la categoría <strong class="font-size-lg">{{ categoria_equipo.categoria_equipo.categoria }}</strong>, 
+                            tanto para actuar como jugador titular y/o suplente y realizar todas las actividades derivadas de tal 
+                            participación, responsabilizándome por la veracidad de la información vertida en la presente.
+                        </p>
+                        <p class="text-justify">
+                            Asimismo, manifiesto con carácter de declaración jurada que los datos completados en Antecedentes de Enfermedades son datos válidos.
+                        </p>
+                    {% empty %}
+                        <p class="text-justify">No hay categorías de equipo disponibles.</p>
+                    {% endfor %}
+
+                    <div class="form-group text-center">
+                        <a href="{% url 'menu_jugador' %}" class="btn btn-danger btn-lg">Cancelar</a>
+                        
+                        {% if ficha_medica.consentimiento_persona %}
+                            <a href="{% url 'menu_jugador' %}" class="btn btn-primary btn-lg">Volver al Menú</a>
+                        {% else %}
+                            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#confirmModal">Aceptar</button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmModalLabel">Confirmar Aceptación</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <strong>Al aceptar, no podrá modificar sus antecedentes de enfermedades.</strong>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <form method="post" action="{% url 'menu_jugador'  %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success">Aceptar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

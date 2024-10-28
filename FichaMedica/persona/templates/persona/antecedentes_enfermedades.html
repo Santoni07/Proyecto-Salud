@@ -1,0 +1,74 @@
+from django.shortcuts import render, redirect
+from .forms import PersonaForm
+from django.contrib.auth.decorators import login_required
+from account.models import Profile  # Asegúrate de que la ruta sea correcta
+from .models import Categoria, Equipo, Persona, torneos
+from django.db.models import ObjectDoesNotExist
+
+@login_required
+def registrar_persona(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        profile = Profile.objects.create(user=request.user)
+
+    # Verificar si ya existe una Persona asociada al perfil
+    persona = getattr(profile, 'persona', None)
+
+    if request.method == 'POST':
+        form = PersonaForm(request.POST, instance=persona)  # Crear o actualizar la instancia de persona
+        if form.is_valid():
+            persona = form.save(commit=False)
+            persona = profile  # Asociar la persona al perfil del usuario
+            persona.save()  # Guardar la instancia de persona
+            return redirect('jugador')
+    else:
+        form = PersonaForm(instance=persona)
+
+    context = {
+        'form': form,
+        'user_form': {
+            'first_name': profile.nombre if profile.nombre else '',
+            'last_name': profile.apellido if profile.apellido else '',
+            'email': profile.email if profile.email else '',
+            'fecha_nacimiento': profile.fecha_nacimiento if profile.fecha_nacimiento else '',
+            'dni': profile.dni if profile.dni else '',
+            'telefono': persona.telefono if persona and persona.telefono else '',
+            'domicilio': persona.direccion if persona and persona.direccion else '',
+            'obra_social': persona.cobertura_medica if persona and persona.cobertura_medica else '',
+            'numero_afiliado': persona.numero_afiliado if persona and persona.numero_afiliado else '',
+            'telefono_alternativo': persona.telefono_alternativo if persona and persona.telefono_alternativo else '',
+            'grupo_sanguineo': persona.grupo_sanguineo if persona and persona.grupo_sanguineo else '',
+            'equipo': persona.equipo if persona and persona.equipo else '',
+            'categoria': persona.categoria if persona and persona.categoria else '',
+            'torneo': persona.torneo if persona and persona.torneo else '',
+        }
+    }
+    
+    return render(request, 'persona/registrar_persona.html', context)
+
+
+
+
+@login_required
+def jugador(request):
+    # Obtener la persona asociada al perfil
+    try:
+        persona = Persona.objects.get(profile__user=request.user)  # Obtén la persona asociada
+    except Persona.DoesNotExist:
+        return redirect('registrar_persona')  # Redirige si no existe
+
+    # Obtener todos los torneos
+    torneo_list = torneos.objects.all()  # Asegúrate de que el nombre de la clase sea correcto
+    categorias = Categoria.objects.all()
+    equipos = Equipo.objects.all()
+    context = {
+        'persona': persona,
+        'torneos': torneo_list,  # Pasa la lista de torneos al contexto
+        'categorias': categorias,
+        'equipos': equipos,
+    }
+
+    return render(request, 'persona/jugador.html', context)
+
+

@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Cargar Estudio Médico</h3>
+                </div>
+                <div class="card-body">
+                    <form id="cargarEstudioForm" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="tipo_estudio" class="font-weight-bold">Tipo de Estudio</label>
+                            {{ form.tipo_estudio|add_class:"form-control" }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observaciones" class="font-weight-bold">Observaciones</label>
+                            {{ form.observaciones|add_class:"form-control" }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="archivo" class="font-weight-bold">Archivo (Imagen o PDF)</label>
+                            {{ form.archivo|add_class:"form-control-file" }}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="{% url 'menu_jugador' %}" class="btn btn-outline-secondary">Volver</a>
+                            <button type="button" onclick="validarFormulario()" class="btn btn-success">Cargar Estudio</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de advertencia -->
+<div class="modal fade" id="alertaModal" tabindex="-1" aria-labelledby="alertaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="alertaModalLabel">Advertencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Debes seleccionar un archivo antes de cargar el estudio.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validarFormulario() {
+        const archivoInput = document.getElementById("id_archivo");
+        if (!archivoInput.value) {
+            const alertaModal = new bootstrap.Modal(document.getElementById('alertaModal'));
+            alertaModal.show();
+        } else {
+            document.getElementById("cargarEstudioForm").submit();
+        }
+    }
+</script>
+{% endblock %}

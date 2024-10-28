@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Antecedentes Médicos de {{ ficha_medica.persona.profile.nombre }} {{ ficha_medica.persona.profile.apellido }}</h2>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title text-center">ANTECEDENTES DE ENFERMEDAD</h5>
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                <div class="form-group row align-items-center">
+                    <label class="col-sm-8 col-form-label">{{ field.label }}</label>
+                    <div class="col-sm-4 d-flex justify-content-end">
+                        <div class="form-check me-2">
+                            <input type="radio" class="form-check-input" id="{{ field.id_for_label }}_si" name="{{ field.name }}" value="True" {% if field.value == 'True' %}checked{% endif %} style="transform: scale(1.5);">
+                            <label class="form-check-label" for="{{ field.id_for_label }}_si">Sí</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="{{ field.id_for_label }}_no" name="{{ field.name }}" value="False" {% if field.value == 'False' %}checked{% endif %} style="transform: scale(1.5);">
+                            <label class="form-check-label" for="{{ field.id_for_label }}_no">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Línea de separación -->
+                <hr>
+
+                <!-- Campos de observación -->
+                {% if field.name == 'alerg_observ' %}
+                <div class="form-group">
+                    <label for="{{ field.name }}_observaciones">Observaciones sobre Alergias</label>
+                    <input type="text" class="form-control form-control-sm" id="{{ field.name }}_observaciones" name="{{ field.name }}" placeholder="Observaciones" style="width: 70%;" value="{{ field.value }}">
+                </div>
+                {% elif field.name == 'fhd_observacion' %}
+                <div class="form-group">
+                    <label for="{{ field.name }}_observaciones">Observaciones sobre FHD</label>
+                    <input type="text" class="form-control form-control-sm" id="{{ field.name }}_observaciones" name="{{ field.name }}" placeholder="Observaciones" style="width: 70%;" value="{{ field.value }}">
+                </div>
+                {% elif field.name == 'cca_observaciones' %}
+                <div class="form-group">
+                    <label for="{{ field.name }}_observaciones">Observaciones sobre CCA</label>
+                    <input type="text" class="form-control form-control-sm" id="{{ field.name }}_observaciones" name="{{ field.name }}" placeholder="Observaciones" style="width: 70%;" value="{{ field.value }}">
+                </div>
+                {% endif %}
+                {% endfor %}
+              
+                <!-- Botón de Guardar fuera del recuadro -->
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary btn-sm" style="width: 40%">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
