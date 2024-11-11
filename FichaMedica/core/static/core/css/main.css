@@ -1886,3 +1886,6 @@ table th.si-no-header {
 #navmenu .nav-item {
   padding: 0 10px; /* Espaciado horizontal entre items */
 }
+.dropdown-menu-medico {
+  z-index: 1000; /* Asegúrate de que el menú esté sobre otros elementos */
+}

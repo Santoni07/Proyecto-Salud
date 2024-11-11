@@ -1,8 +1,11 @@
+from datetime import timedelta
 import os
 from django.db import models
 from persona.models import  Torneo ,Jugador
+from Medico.models import Medico
 from django.dispatch import receiver
 from django.db.models.signals import post_delete, pre_save
+
 
 
 class AntecedenteEnfermedades(models.Model):
@@ -45,28 +48,28 @@ class AntecedenteEnfermedades(models.Model):
 
 class RegistroMedico(models.Model):
     ESTADO_FICHA = [
-    ('PENDIENTE', 'Pendiente'),
-    ('PROCESO', 'En proceso'),
-    ('APROBADA', 'Aprobada'),
-    
-    ('RECHAZADA', 'Rechazada'),
+        ('PENDIENTE', 'Pendiente'),
+        ('PROCESO', 'En proceso'),
+        ('APROBADA', 'Aprobada'),
+        ('RECHAZADA', 'Rechazada'),
     ]
     
     idfichaMedica = models.AutoField(primary_key=True)
-    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE ,related_name='registros_medicos')
     torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE)  # Relación con Torneo
     estado = models.CharField(max_length=45, choices=ESTADO_FICHA, blank=True, null=True)  # Estado actual de la ficha médica
     fecha_creacion = models.DateTimeField(auto_now_add=True) 
-    fecha_caducidad = models.DateField()  # Fecha de caducidad
+    fecha_caducidad = models.DateField(blank=True, null=True)  # Inicialmente null
+    fecha_de_llenado = models.DateField(blank=True, null=True)  # Campo para fecha de llenado
     observacion = models.CharField(max_length=200, blank=True, null=True)  # Observaciones adicionales
     consentimiento_persona = models.BooleanField(null=True, blank=True)  # Consentimiento de la persona
+    medico = models.ForeignKey(Medico, on_delete=models.SET_NULL, null=True, blank=True)  # Relación opcional con el modelo Medico
     
     class Meta:
         db_table = 'fichaRegistro'
 
     def __str__(self):
-        # Accediendo al nombre y apellido del perfil del jugador
-        return f"{self.jugador.persona.profile.nombre} {self.jugador.persona.profile.apellido} "
+        return f"{self.jugador.persona.profile.nombre} {self.jugador.persona.profile.apellido}"
 
 class EstudiosMedico(models.Model):
     TIPO_ESTUDIO = [

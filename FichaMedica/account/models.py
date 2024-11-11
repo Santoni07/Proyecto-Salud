@@ -25,5 +25,12 @@ class Profile(models.Model):
     class Meta:
         ordering = ['user__username']
 
+    @property
+    def edad(self):
+        from datetime import date
+        if self.fecha_nacimiento:
+            today = date.today()
+            return today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+        return None
     def __str__(self):
         return f"{self.nombre} {self.apellido} - {self.rol}"
