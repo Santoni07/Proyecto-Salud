@@ -1889,3 +1889,6 @@ table th.si-no-header {
 .dropdown-menu-medico {
   z-index: 1000; /* Asegúrate de que el menú esté sobre otros elementos */
 }
+#loom-companion-mv3 {
+  display: none !important;
+}

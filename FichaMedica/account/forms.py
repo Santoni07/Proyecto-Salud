@@ -16,10 +16,25 @@ class UserRegistrationForm(forms.ModelForm):
         model = Profile  # Asegúrate de usar el modelo correcto aquí
         fields = ['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'email', 'password1', 'password2']
 
+    def clean_email(self):
+        """ Verificar si el email ya está registrado. """
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+        return email
+
+    def clean_dni(self):
+        """ Verificar si el DNI ya está registrado. """
+        dni = self.cleaned_data.get('dni')
+        if Profile.objects.filter(dni=dni).exists():
+            raise forms.ValidationError("Este DNI ya está registrado.")
+        return dni
+
     def clean_password2(self):
+        """ Verificar que las contraseñas coincidan. """
         cd = self.cleaned_data
         if cd['password1'] != cd['password2']:
-            raise forms.ValidationError('Las contraseñas no son iguales')
+            raise forms.ValidationError('Las contraseñas no son iguales.')
         return cd['password2']
 
     def save(self, commit=True):
@@ -45,4 +60,4 @@ class UserRegistrationForm(forms.ModelForm):
         if commit:
             profile.save()  # Guarda el perfil
 
-        return user, profile  # Devuelve tanto el usuario como el perfil
+        return user, profile 

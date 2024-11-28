@@ -11,6 +11,12 @@ urlpatterns = [
     path('fetch_categorias/<int:torneo_id>/', views.fetch_categorias, name='fetch_categorias'),
     path('fetch_equipos/<int:categoria_id>/', views.fetch_equipos, name='fetch_equipos'),
     path('menu_jugador/', views.menu_jugador, name='menu_jugador'),
+    path('perfil/', views.perfil, name='perfil'),
+     # URL para cambiar el email
+    path('modificar_email/', views.cambiar_email, name='modificar_email'),
+
+    # URL para cambiar la contraseña
+    path('modificar_contrasena/', views.cambiar_contraseña, name='modificar_contrasena'),
    
    
     path('modificar_perfil/', views.modificar_perfil, name='modificar_perfil'),

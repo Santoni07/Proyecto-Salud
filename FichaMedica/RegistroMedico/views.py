@@ -117,51 +117,24 @@ class ModificarAntecedenteView(UpdateView):
         # Retornar el objeto AntecedenteEnfermedades correspondiente
         return get_object_or_404(AntecedenteEnfermedades, pk=antecedente_id)
 
-""" class ActualizarConsentimientoView(UpdateView):
-    model = RegistroMedico
-    fields = []
-    template_name = 'registro_medico/consentimiento.html'
-    success_url = reverse_lazy('menu_jugador')
 
-    def form_valid(self, form):
-        # Establecer el consentimiento_persona en True
-        form.instance.consentimiento_persona = True
-        form.instance.save()
 
-   
-       
-         # Redirigir a una página de éxito o lo que desees
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        # Define la URL de redirección al guardar correctamente
-        return reverse('menu_jugador')  # Cambia por la URL de éxito
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Obtener el perfil del usuario logueado
-        profile = self.request.user.profile
-        context['profile'] = profile  # Pasar el perfil al contexto
-         # Obtener la ficha médica asociada
-        ficha_medica = self.get_object()  # Obtiene la instancia actual de RegistroMedico
-        context['ficha_medica'] = ficha_medica  # Pasar la ficha médica al contexto
-        return context
- """
 class ActualizarConsentimientoView(UpdateView):
     model = RegistroMedico
-    fields = []  # Los campos se manejan de forma manual
+    fields = ['consentimiento_persona']  
     template_name = 'registro_medico/consentimiento.html'
     success_url = reverse_lazy('menu_jugador')
 
     def form_valid(self, form):
-        # Establecer el consentimiento_persona en True
-        form.instance.consentimiento_persona = True
-        form.instance.save()
-        return super().form_valid(form)  # Usa el método del padre para redirigir
+        if not form.instance.consentimiento_persona:
+            form.instance.consentimiento_persona = True
+            form.instance.save()
+            print("Consentimiento actualizado a:", form.instance.consentimiento_persona)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         # Obtener el perfil del usuario logueado
         profile = self.request.user.profile
         context['profile'] = profile  # Pasar el perfil al contexto
@@ -179,8 +152,9 @@ class ActualizarConsentimientoView(UpdateView):
             # Acceder a las categorías del jugador a través de JugadorCategoriaEquipo
             categorias = JugadorCategoriaEquipo.objects.filter(jugador=jugador)
             context['categorias_equipo'] = categorias  # Pasar las categorías al contexto
-
+        print(f"Ficha médica pk: {ficha_medica.pk}")
         return context
+
     
     
 class CargarEstudioView(LoginRequiredMixin, CreateView):

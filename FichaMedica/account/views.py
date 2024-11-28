@@ -24,7 +24,7 @@ def user_login(request):
                     # Redirigir según el rol del usuario
                     if profile.rol == 'medico':  # Verifica si el rol es médico
                         return redirect('medico_home')  # Cambia a la URL adecuada para médicos
-                    elif profile.rol == 'jugador':  # Verifica si el rol es jugador
+                    elif profile.rol == 'general':  # Verifica si el rol es jugador
                         return redirect('registrar_persona')  # Cambia a la URL adecuada para jugadores
                     else:
                         return redirect('home')  # Redirigir a una página predeterminada si no es médico ni jugador
@@ -36,25 +36,6 @@ def user_login(request):
         form = LoginForm()
     return render(request, 'account/login.html', {'form': form})
 
-""" @never_cache
-def user_login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data  # Limpio los datos
-            user = authenticate(request, username=cd['email'], password=cd['password'])  # Autenticación por email
-            if user is not None:  # Si el usuario existe y está activo
-                if user.is_active:
-                    login(request, user)
-                    return redirect('registrar_persona')  # Cambia a la URL adecuada
-                else:
-                    return HttpResponse('El usuario no está activo')
-            else:
-                return HttpResponse('Usuario o contraseña incorrectos')
-    else:
-        form = LoginForm()
-    return render(request, 'account/login.html', {'form': form})
- """
 @login_required
 def dashboard(request):
     return redirect('persona/registrar')
@@ -74,3 +55,8 @@ def register(request):
 
 def logout_view(request):
     return render(request, 'core/home.html')
+
+
+
+def recover_Password(request):
+    return render(request, 'account/password_change_form.html')

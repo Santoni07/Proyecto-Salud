@@ -153,8 +153,8 @@ class OftalmologicoForm(forms.ModelForm):
 class RegistroMedicoUpdateForm(forms.ModelForm):
     class Meta:
         model = RegistroMedico
-        fields = ['estado', 'observacion', 'fecha_creacion', 'fecha_caducidad']
+        fields = ['estado', 'observacion', 'fecha_de_llenado', 'fecha_caducidad', 'medico']
         widgets = {
-            'fecha_creacion': forms.DateInput(attrs={'type': 'date'}),
+            'fecha_de_llenado': forms.DateInput(attrs={'type': 'date'}),
             'fecha_caducidad': forms.DateInput(attrs={'type': 'date'}),
-        }
+        } 

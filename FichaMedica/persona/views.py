@@ -1,10 +1,12 @@
 
-
-from pyexpat.errors import messages
+from django.views.decorators.cache import never_cache
+from django.contrib import messages
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 from RegistroMedico.models import AntecedenteEnfermedades, RegistroMedico
 
@@ -175,7 +177,7 @@ def seleccionar_categoria_equipo(request):
             )
 
             # Redirigir o mostrar un mensaje de éxito
-            return redirect('dashboard_jugador')  # O la URL a la que quieras redirigir
+            return redirect('menu_jugador')  # O la URL a la que quieras redirigir
 
         except Jugador.DoesNotExist:
             print("Error: El jugador no existe para la persona.")
@@ -196,9 +198,13 @@ def seleccionar_categoria_equipo(request):
         print("Torneos disponibles:", torneos)
         return render(request, 'persona/seleccionar_categoria_equipo.html', {'torneos': torneos})
 
+
 def error_registro(request):
     return render(request, 'persona/error_registro.html')
 
+
+@login_required
+@never_cache
 def menu_jugador(request):
     # Obtener el perfil del usuario logueado
     profile = request.user.profile
@@ -295,3 +301,68 @@ def modificar_perfil(request):
         'jugador': jugador  # Pasa el objeto jugador al contexto
     })
 
+def perfil(request):
+    # Obtener el perfil del usuario actual
+    profile = request.user.profile
+
+    # Obtener la persona asociada al perfil (si existe)
+    persona = getattr(profile, 'persona', None)
+
+    # Obtener el jugador asociado a la persona (si existe)
+    jugador = None
+    if persona:
+        jugador = getattr(persona, 'jugador', None)
+
+    # Pasar profile, persona y jugador al contexto
+    return render(request, 'persona/perfil.html', {
+        'profile': profile,  # Pasamos el perfil
+        'persona': persona,  # Pasamos la persona
+        'jugador': jugador,  # Pasamos el jugador (si existe)
+    })
+
+def cambiar_email(request):
+    # Obtener el perfil del usuario actual
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        
+        new_email = request.POST.get('email')
+
+        
+        user = request.user
+        user.email = new_email
+        
+        
+        user.username = new_email  
+
+        user.save() 
+
+        
+        profile.email = new_email
+        profile.save()  
+
+        return redirect('perfil')  
+
+    return render(request, 'persona/modificar_email.html', {'profile': profile})
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    old_password = forms.CharField(label="Contraseña Actual", widget=forms.PasswordInput, required=True)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get('old_password')
+        if not self.user.check_password(old_password):  # Verifica si la contraseña actual es correcta
+            raise forms.ValidationError("La contraseña actual no es correcta.")
+        return old_password
+
+def cambiar_contraseña(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()  # Guarda el nuevo password
+            update_session_auth_hash(request, user)  # Mantener la sesión activa después de cambiar la contraseña
+            messages.success(request, '¡Contraseña cambiada con éxito!')  # Agregar mensaje de éxito
+            return redirect('perfil')  # Redirigir al perfil o donde desees
+    else:
+        form = CustomPasswordChangeForm(request.user)
+
+    return render(request, 'persona/modificar_contrasena.html', {'form': form})

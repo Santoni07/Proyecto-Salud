@@ -36,6 +36,9 @@ class Jugador(models.Model):
 
 class Torneo(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
+    descripcion = models.TextField(verbose_name='Descripción',null=True, blank=True)
+    direccion = models.CharField(max_length=255, verbose_name='Dirección', null=True, blank=True)
+    telefono = models.CharField(max_length=15, verbose_name='Teléfono', null=True, blank=True)
     imagen = models.ImageField(upload_to='imagenes/', null=True, blank=True, verbose_name='Imagen')
     
     def __str__(self):

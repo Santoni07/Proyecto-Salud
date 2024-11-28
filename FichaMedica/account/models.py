@@ -32,5 +32,13 @@ class Profile(models.Model):
             today = date.today()
             return today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
         return None
+    
+    def save(self, *args, **kwargs):
+        # Capitalizar la primera letra del nombre y apellido
+        if self.nombre:
+            self.nombre = self.nombre.capitalize()
+        if self.apellido:
+            self.apellido = self.apellido.capitalize()
+        super().save(*args, **kwargs)  # Llamar al método save del modelo base
     def __str__(self):
         return f"{self.nombre} {self.apellido} - {self.rol}"
