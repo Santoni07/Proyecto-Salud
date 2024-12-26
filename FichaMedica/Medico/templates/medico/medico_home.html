@@ -129,7 +129,18 @@ body{
                         <td>
                             <div class="btn-group" role="group" aria-label="Basic example">
                                 {% if jugador.registro_medico_estado == "PROCESO" %}
-                                    <a href="#" class="btn btn-warning me-2" onclick="toggleSearchMenu()">Cargar Ficha</a>
+                                    {% if jugador.edad >= 35 %}
+                                        {% if jugador.ergonometria_cargado %}
+                                            <!-- Mostrar botón para cargar ficha si tiene electrocardiograma -->
+                                            <a href="#" class="btn btn-warning me-2" onclick="toggleSearchMenu()">Cargar Ficha</a>
+                                        {% else %}
+                                            <!-- Mostrar mensaje de falta de electrocardiograma -->
+                                            <span class="text-danger">Falta Ergonometria</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <!-- Para jugadores menores de 35, mostrar directamente el botón -->
+                                        <a href="#" class="btn btn-warning me-2" onclick="toggleSearchMenu()">Cargar Ficha</a>
+                                    {% endif %}
                                     
                                 {% elif jugador.registro_medico_estado == "PENDIENTE" %}
                                 <a href="#" class="btn btn-warning me-2" onclick="toggleSearchMenu()">Modificar</a>

@@ -14,6 +14,7 @@ urlpatterns = [
  
     path('registro-medico/', include('RegistroMedico.urls')), 
     path('medico/', include('Medico.urls')),
+    path('Representate/', include('Representate.urls')),
    
     
 ]

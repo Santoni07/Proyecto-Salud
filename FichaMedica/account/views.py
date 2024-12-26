@@ -26,6 +26,8 @@ def user_login(request):
                         return redirect('medico_home')  # Cambia a la URL adecuada para médicos
                     elif profile.rol == 'general':  # Verifica si el rol es jugador
                         return redirect('registrar_persona')  # Cambia a la URL adecuada para jugadores
+                    elif profile.rol == 'representante':
+                        return redirect('representante_home')
                     else:
                         return redirect('home')  # Redirigir a una página predeterminada si no es médico ni jugador
                 else:

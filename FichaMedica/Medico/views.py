@@ -12,7 +12,7 @@ from weasyprint import HTML
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-
+from django.http import JsonResponse
 
 class MedicoHomeView(LoginRequiredMixin, ListView):
     model = Jugador
@@ -20,21 +20,20 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
     context_object_name = 'jugadores'
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related('persona__profile').prefetch_related(
-            Prefetch(
+        queryset = super().get_queryset().select_related('persona__profile').prefetch_related()
+        Prefetch(
                 'jugadorcategoriaequipo_set',
                 queryset=JugadorCategoriaEquipo.objects.select_related(
                     'categoria_equipo__categoria__torneo', 'categoria_equipo__equipo'
                 )
             )
-        )
         
         # Obtener el término de búsqueda
         search_query = self.request.GET.get('search_query', '').strip()
 
         # Verificar si el término de búsqueda es un DNI
         if search_query:
-            if search_query.isdigit() and len(search_query)  == 8:
+            if search_query.isdigit() and len(search_query) == 8:
                 # Filtrar según el DNI
                 queryset = queryset.filter(
                     Q(persona__profile__dni__icontains=search_query)
@@ -65,7 +64,6 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
         except Medico.DoesNotExist:
             context['medico'] = None
 
-                                   
         jugadores_info = []
         for jugador in context['jugadores']:
             jugador_info = {
@@ -82,20 +80,27 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 'categorias_equipo': [],
                 'antecedentes': [],
                 'estudios_medicos': [],
-                'electro_basal_form': ElectroBasalForm() ,
+                'electro_basal_form': ElectroBasalForm(),
                 'electro_esfuerzo_form': None,
                 'cardiovascular_form': None,
                 'laboratorio_form': None,
                 'oftalmologico_form': None,
                 'torax_form': None,
-                'registro_medico_form':None,
+                'registro_medico_form': None,
+                
+                'ergonometria_cargado': False,  # Agregar la comprobación para el electrocardiograma
             }
 
             # Registro médico y antecedentes
             registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
             if registro_medico:
-                
-                 # Obtener estudios médicos
+                jugador_info['registro_medico_estado'] = registro_medico.estado
+
+                # Verificar si hay un electrocardiograma cargado
+                estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico, tipo_estudio='ERGOMETRIA')
+                jugador_info['ergonometria_cargado'] = estudios_medicos.exists()
+
+                # Obtener estudios médicos
                 estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico)
                 jugador_info['estudios_medicos'] = [
                     {
@@ -110,36 +115,36 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 # Obtener antecedentes
                 antecedentes = AntecedenteEnfermedades.objects.filter(idfichaMedica=registro_medico)
                 jugador_info['antecedentes'] = [
-                        {
-                            'fue_operado': ant.fue_operado,
-                            'toma_medicacion': ant.toma_medicacion,
-                            'estuvo_internado': ant.estuvo_internado,
-                            'sufre_hormigueos': ant.sufre_hormigueos,
-                            'es_diabetico': ant.es_diabetico,
-                            'es_asmatico': ant.es_amatico,
-                            'es_alergico': ant.es_alergico,
-                            'alerg_observ': ant.alerg_observ,
-                            'antecedente_epilepsia': ant.antecedente_epilepsia,
-                            'desviacion_columna': ant.desviacion_columna,
-                            'dolor_cintura': ant.dolor_cintira,
-                            'fracturas': ant.fracturas,
-                            'dolores_articulares': ant.dolores_articulares,
-                            'falta_aire': ant.falta_aire,
-                            'traumatismos_craneo': ant.tramatismos_craneo,
-                            'dolor_pecho': ant.dolor_pecho,
-                            'perdida_conocimiento': ant.perdida_conocimiento,
-                            'presion_arterial': ant.presion_arterial,
-                            'muerte_subita_familiar': ant.muerte_subita_familiar,
-                            'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
-                            'soplo_cardiaco': ant.soplo_cardiaco,
-                            'abstenerce_competencia': ant.abstenerce_competencia,
-                            'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
-                            'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
-                            'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
-                            'cca_observaciones': ant.cca_observaciones,
-                        }
-                        for ant in antecedentes
-            ]
+                    {
+                        'fue_operado': ant.fue_operado,
+                        'toma_medicacion': ant.toma_medicacion,
+                        'estuvo_internado': ant.estuvo_internado,
+                        'sufre_hormigueos': ant.sufre_hormigueos,
+                        'es_diabetico': ant.es_diabetico,
+                        'es_asmatico': ant.es_amatico,
+                        'es_alergico': ant.es_alergico,
+                        'alerg_observ': ant.alerg_observ,
+                        'antecedente_epilepsia': ant.antecedente_epilepsia,
+                        'desviacion_columna': ant.desviacion_columna,
+                        'dolor_cintura': ant.dolor_cintira,
+                        'fracturas': ant.fracturas,
+                        'dolores_articulares': ant.dolores_articulares,
+                        'falta_aire': ant.falta_aire,
+                        'traumatismos_craneo': ant.tramatismos_craneo,
+                        'dolor_pecho': ant.dolor_pecho,
+                        'perdida_conocimiento': ant.perdida_conocimiento,
+                        'presion_arterial': ant.presion_arterial,
+                        'muerte_subita_familiar': ant.muerte_subita_familiar,
+                        'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
+                        'soplo_cardiaco': ant.soplo_cardiaco,
+                        'abstenerce_competencia': ant.abstenerce_competencia,
+                        'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
+                        'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
+                        'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
+                        'cca_observaciones': ant.cca_observaciones,
+                    }
+                    for ant in antecedentes
+                ]
                 
                 # Instanciar formularios con datos existentes, si están presentes
                 jugador_info['electro_basal_form'] = ElectroBasalForm(
@@ -160,6 +165,8 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 jugador_info['torax_form'] = ToraxForm(
                     instance=Torax.objects.filter(ficha_medica=registro_medico).first()
                 )
+                
+          
             
             # Categorías y equipos asociados al jugador
             jugador_categoria_equipos = jugador.jugadorcategoriaequipo_set.all()
@@ -175,9 +182,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
 
         context['jugadores_info'] = jugadores_info
         return context
-   
-from django.http import JsonResponse
-
+ 
 def electro_basal_view(request, jugador_id):
     jugador = get_object_or_404(Jugador, id=jugador_id)
     registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
