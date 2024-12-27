@@ -26,30 +26,22 @@ class RepresentanteHomeView(LoginRequiredMixin, View):
         query_dict = QueryDict(mutable=True)
         query_dict.update(request.GET)
 
-        filter_type = query_dict.get('filter_type')
+        filter_type = query_dict.get('filter_type', None)
         filter_team_list = query_dict.getlist('filter_team')  # Obtén todos los valores para filter_team
         filter_team = filter_team_list[0] if filter_team_list else None  # Usa solo el primero si hay duplicados
-        filter_category = query_dict.get('filter_category')
-        search_query = query_dict.get('search_query')
+        filter_category = query_dict.get('filter_category', None)
+        search_query = query_dict.get('search_query', None)
 
         print("Parámetros recibidos:", query_dict)
         jugadores = []  # Asegúrate de que se limpie al comienzo
 
         try:
-            if filter_type == 'equipo' and filter_team:
+            if filter_type == 'equipo' :
                 jugadores = []  # Limpia antes de ejecutar el filtro
                 equipo_id = int(filter_team)
                 print("Equipo ID:", equipo_id)
-                if filter_category:
-                    categoria_id = int(filter_category)
-                    print("Categoría ID:", categoria_id)
-                    jugadores = Jugador.objects.filter(
-                        jugadorcategoriaequipo__categoria_equipo__equipo_id=equipo_id,
-                        jugadorcategoriaequipo__categoria_equipo__categoria_id=categoria_id,
-                        jugadorcategoriaequipo__categoria_equipo__categoria__torneo=representante.torneo
-                    ).distinct()
-                else:
-                    jugadores = Jugador.objects.filter(
+               
+                jugadores = Jugador.objects.filter(
                         jugadorcategoriaequipo__categoria_equipo__equipo_id=equipo_id,
                         jugadorcategoriaequipo__categoria_equipo__categoria__torneo=representante.torneo
                     ).distinct()
@@ -178,6 +170,7 @@ def obtener_jugadores_por_torneo(torneo_id):
     
     return [jce.jugador for jce in jugadores_categoria_equipos] 
 
+    
 def traer_equipos(request):
     if request.method == 'POST':
         categoria_id = request.POST.get('categoria_id')
