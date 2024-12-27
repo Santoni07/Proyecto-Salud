@@ -65,11 +65,7 @@ class RepresentanteHomeView(LoginRequiredMixin, View):
                         jugadorcategoriaequipo__categoria_equipo__categoria_id=categoria_id,
                         jugadorcategoriaequipo__categoria_equipo__categoria__torneo=representante.torneo
                     ).distinct()
-                else:
-                    jugadores = Jugador.objects.filter(
-                        jugadorcategoriaequipo__categoria_equipo__categoria_id=categoria_id,
-                        jugadorcategoriaequipo__categoria_equipo__categoria__torneo=representante.torneo
-                    ).distinct()
+                
 
             elif filter_type == 'persona' and search_query:
                 jugadores = []  # Limpia antes de ejecutar el filtro

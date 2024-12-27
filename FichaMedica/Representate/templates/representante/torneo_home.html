@@ -3,7 +3,20 @@
 
 {% block content %}
 <div class="container my-4">
-    <h1 class="text-center">Página del Representante: {{ representante.torneo }}</h1>
+    <div class="d-flex align-items-center justify-content-center mt-3">
+        {% if representante.torneo.imagen %}
+            <img src="{{ representante.torneo.imagen.url }}" 
+                 alt="Imagen del Torneo {{ representante.torneo.nombre }}" 
+                 class="img-fluid me-3" 
+                 style="max-width: 80px; border-radius: 50%;">
+        {% else %}
+            <div class="placeholder-image me-3" 
+                 style="width: 80px; height: 80px; border-radius: 50%; background-color: #f0f0f0;"></div>
+        {% endif %}
+        <h1 class="mb-0">Página del Representante: {{ representante.torneo }}</h1>
+    </div>
+
+  
 
     <div id="search-container" class="bg-light p-4 rounded shadow-sm">
         <form method="get" action="{% url 'representante_home' %}" class="my-4">
@@ -154,19 +167,10 @@
     const filterCategory = document.getElementById('filter_category');
     const filterTeamByCategory = document.getElementById('filter_team_by_category');
     const filterEquipoCategoria = document.getElementById('filter-equipo-categoria');
+    const resultsContainer = document.getElementById('results-container'); // Contenedor para resultados (si aplica)
 
-    const resultsContainer = document.getElementById('resultados-busqueda'); // Contenedor donde se muestran los resultados de la búsqueda
-
-    // Manejar el cambio en el filtro principal (equipo, categoría, persona)
+    // Manejar el cambio en el filtro principal
     document.getElementById('filter_type').addEventListener('change', function () {
-        // Limpiar resultados anteriores
-        if (resultsContainer) {
-            resultsContainer.innerHTML = ''; // Limpiar los resultados de búsqueda
-        }
-
-        // Limpiar la consola (si lo deseas)
-        console.clear();
-
         const selectedFilter = this.value;
 
         // Ocultar todas las secciones
@@ -177,10 +181,15 @@
             filterSections[selectedFilter].classList.remove('d-none');
         }
 
-        // Si la categoría es seleccionada, mostrar el submenú de equipos
+        // Limpiar resultados y opciones de equipos si se cambia el filtro
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+        }
         if (selectedFilter === 'categoria') {
-            filterEquipoCategoria.classList.remove('d-none'); // Mostrar submenú de equipos
+            filterEquipoCategoria.classList.remove('d-none');
             filterTeamByCategory.innerHTML = '<option value="">Todos los equipos</option>'; // Reiniciar submenú
+        } else {
+            filterEquipoCategoria.classList.add('d-none'); // Ocultar si no es categoría
         }
     });
 
@@ -196,14 +205,14 @@
 
         // Limpiar resultados anteriores
         if (resultsContainer) {
-            resultsContainer.innerHTML = ''; // Limpiar los resultados de búsqueda
+            resultsContainer.innerHTML = '';
         }
 
         // Vaciar el select de equipos
-        filterTeamByCategory.innerHTML = '<option value="">Seleccionar...</option>';
+        filterTeamByCategory.innerHTML = '<option value="">Seleccionar equipo</option>';
 
         if (categoryId) {
-            // Hacer la solicitud AJAX
+            // Hacer la solicitud AJAX para obtener los equipos
             fetch("{% url 'traer_equipos' %}", {
                 method: "POST",
                 headers: {
@@ -212,36 +221,45 @@
                 },
                 body: JSON.stringify({ categoria_id: categoryId })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error en la respuesta del servidor");
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.equipos) {
-                    // Llenar el select de equipos con los datos recibidos
-                    data.equipos.forEach(equipo => {
-                        const option = document.createElement("option");
-                        option.value = equipo.id;
-                        option.textContent = equipo.nombre;
-                        filterTeamByCategory.appendChild(option);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("Error al cargar los equipos:", error);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error en la respuesta del servidor");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.equipos) {
+                        // Llenar el select de equipos con los datos recibidos
+                        data.equipos.forEach(equipo => {
+                            const option = document.createElement("option");
+                            option.value = equipo.id;
+                            option.textContent = equipo.nombre;
+                            filterTeamByCategory.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al cargar los equipos:", error);
+                });
         }
     });
 
-    window.addEventListener('DOMContentLoaded', (event) => {
+    // Evento: cuando cambia el equipo seleccionado
+    filterTeamByCategory.addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+
+        if (selectedOption.value) {
+            console.log(`Equipo seleccionado: ${selectedOption.textContent}`);
+        }
+    });
+
+    // Asegurarse de mostrar el submenú de equipos al cargar la página si es necesario
+    window.addEventListener('DOMContentLoaded', () => {
         const selectedFilter = document.getElementById('filter_type').value;
         if (selectedFilter === 'categoria' && filterCategory.value) {
             filterEquipoCategoria.classList.remove('d-none');
         }
     });
 </script>
-
 
 {% endblock %} 
