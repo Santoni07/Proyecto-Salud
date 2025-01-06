@@ -2,7 +2,7 @@
     
 from datetime import datetime, timedelta
 
-from django.http import HttpResponseRedirect
+
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, DetailView,UpdateView,CreateView,DeleteView,ListView
@@ -195,3 +195,12 @@ class EliminarEstudioView(DeleteView):
     def get_success_url(self):
        ficha_medica_id = self.object.ficha_medica.idfichaMedica
        return reverse_lazy('registroMedico:ver_estudios', kwargs={'ficha_medica_id': ficha_medica_id})
+class EliminarEstudioMedicoView(DeleteView):
+    model = EstudiosMedico
+    template_name = 'registro_medico/eliminar_estudio_confirm.html'
+    success_url = reverse_lazy('medico_home')  # Redirige a la lista de estudios
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ficha_medica'] = self.object.ficha_medica  # Agrega la ficha médica al contexto
+        return context

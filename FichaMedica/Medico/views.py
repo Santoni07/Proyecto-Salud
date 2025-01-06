@@ -20,14 +20,15 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
     context_object_name = 'jugadores'
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related('persona__profile').prefetch_related()
-        Prefetch(
+        queryset = super().get_queryset().select_related('persona__profile').prefetch_related(
+            Prefetch(
                 'jugadorcategoriaequipo_set',
                 queryset=JugadorCategoriaEquipo.objects.select_related(
                     'categoria_equipo__categoria__torneo', 'categoria_equipo__equipo'
                 )
             )
-        
+        )
+
         # Obtener el término de búsqueda
         search_query = self.request.GET.get('search_query', '').strip()
 
@@ -43,7 +44,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 queryset = queryset.filter(
                     Q(persona__profile__nombre__icontains=search_query) |
                     Q(persona__profile__apellido__icontains=search_query)
-                )    
+                )
             else:
                 # Mostrar un mensaje de error si no cumple con el formato de DNI
                 messages.error(self.request, "El valor ingresado para la busqueda por DNI es incorrecto. Debe contener exactamente 8 números.")
@@ -87,7 +88,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 'oftalmologico_form': None,
                 'torax_form': None,
                 'registro_medico_form': None,
-                
+                'estudio_medico_form': EstudioMedicoForm(),
                 'ergonometria_cargado': False,  # Agregar la comprobación para el electrocardiograma
             }
 
@@ -104,6 +105,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico)
                 jugador_info['estudios_medicos'] = [
                     {
+                        'pk': estudio.pk,
                         'tipo': estudio.get_tipo_estudio_display(),
                         'archivo': estudio.archivo.url if estudio.archivo else None,
                         'observaciones': estudio.observaciones,
@@ -165,8 +167,6 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 jugador_info['torax_form'] = ToraxForm(
                     instance=Torax.objects.filter(ficha_medica=registro_medico).first()
                 )
-                
-          
             
             # Categorías y equipos asociados al jugador
             jugador_categoria_equipos = jugador.jugadorcategoriaequipo_set.all()
@@ -181,8 +181,37 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
             jugadores_info.append(jugador_info)
 
         context['jugadores_info'] = jugadores_info
+         # Pasar el pk al contexto
+        context['pk'] = self.kwargs.get('pk') 
         return context
- 
+
+    def post(self, request, *args, **kwargs):
+        print("Datos del formulario:", request.POST)
+        # Procesar el formulario de estudios médicos cuando el método sea POST
+        form = EstudioMedicoForm(request.POST, request.FILES)
+        if form.is_valid():
+            estudio_medico = form.save(commit=False)
+            # Asociar el estudio médico con el jugador o ficha médica correspondiente
+            jugador_id = request.POST.get('jugador_id')  # O lo que uses para identificar al jugador
+            jugador = Jugador.objects.get(id=jugador_id)
+            print("Jugador ID:", jugador_id)
+            registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
+            print("Registro Médico:", registro_medico)
+            if registro_medico:
+                estudio_medico.ficha_medica = registro_medico
+                estudio_medico.save()
+                messages.success(request, "Estudio médico cargado exitosamente.")
+            else:
+                messages.error(request, "No se encontró el registro médico del jugador.")
+
+            # Redirigir o mostrar el formulario actualizado
+            return redirect('medico_home')  # Asegúrate de que esta URL esté definida en tus URLs
+        else:
+            print("Error : " ,form.errors)
+            messages.error(request, "Hubo un error al cargar el estudio médico.")
+            return redirect('medico_home')
+        
+        
 def electro_basal_view(request, jugador_id):
     jugador = get_object_or_404(Jugador, id=jugador_id)
     registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()

@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load widget_tweaks %}
 
 <style>
 body{
@@ -135,7 +136,10 @@ body{
                                             <a href="#" class="btn btn-warning me-2" onclick="toggleSearchMenu()">Cargar Ficha</a>
                                         {% else %}
                                             <!-- Mostrar mensaje de falta de electrocardiograma -->
-                                            <span class="text-danger">Falta Ergonometria</span>
+                                            <div class="text-center">
+                                                <p class="text-danger mb-2">Falta Ergonometría</p>
+                                                <a href="#" class="btn btn-warning" onclick="toggleSearchMenu()">Cargar Ficha</a>
+                                            </div>
                                         {% endif %}
                                     {% else %}
                                         <!-- Para jugadores menores de 35, mostrar directamente el botón -->
@@ -397,31 +401,63 @@ body{
             <div class="col-lg-6 col-md-8 mx-auto">
                 {% for jugador in jugadores_info %}
                     
-                    <!-- Estudios Medicos -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <button class="btn btn-secondary w-100" onclick="toggleForm('estudios-medicos')">
-                            Estudios Medicos
-                            </button>
-                        </div>
-                        <div id="estudios-medicos" class="card-body" style="display: none;">
-                        
-                        {% for estudio in jugador.estudios_medicos %}
-                        <div class="mb-2">
-                            <strong>{{ estudio.tipo }}:</strong>
-                            {% if estudio.archivo %}
-                            <a href="{{ estudio.archivo }}" target="_blank" class="btn btn-link">Ver archivo</a>
-                            {% else %}
-                            <span class="text-danger">No cargado</span>
-                            {% endif %}
-                            <p><strong>Observaciones:</strong> {{ estudio.observaciones|default:"Sin observaciones" }}</p>
-                        </div>
-                        {% endfor %}
-                        {% if not jugador.estudios_medicos %}
-                        <p>No hay estudios médicos cargados.</p>
-                        {% endif %}
-                        </div>
-                    </div>
+                    <!-- Estudios Médicos -->
+<div class="card mb-3">
+    <div class="card-header">
+        <button class="btn btn-secondary w-100" onclick="toggleForm('estudios-medicos')">
+            Estudios Médicos
+        </button>
+    </div>
+    <div id="estudios-medicos" class="card-body" style="display: none;">
+        <!-- Mostrar Estudios Existentes -->
+        {% for estudio in jugador.estudios_medicos %}
+        <div class="mb-2">
+            <strong>Tipo: </strong>{{ estudio.tipo }}
+            {% if estudio.archivo %}
+            <a href="{{ estudio.archivo }}" target="_blank" class="btn btn-link">Ver archivo</a>
+             <!-- Botón Eliminar -->
+             <form action="{% url 'registroMedico:eliminar_estudio_medico' estudio.pk %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que quieres eliminar este archivo?')">Eliminar</button>
+            </form>
+            
+            {% else %}
+            
+            <span class="text-danger">No cargado</span>
+            {% endif %}
+            <p><strong>Observaciones:</strong> {{ estudio.observaciones|default:"Sin observaciones" }}</p>
+        </div>
+        {% endfor %}
+        {% if not jugador.estudios_medicos %}
+        <p>No hay estudios médicos cargados.</p>
+        {% endif %}
+        <h3 class="text-center">Cargar Estudios</h3>
+        <!-- Formulario para Cargar Nuevos Estudios -->
+        <form ="cargarEstudioForm_{{ jugador.id }}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+              <!-- Campo oculto para el ID del Jugador -->
+              <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+            <div class="mb-3">
+                <label for="tipo_{{ jugador.id }}" class="form-label">Tipo de Estudio</label>
+                <select id="tipo_{{ jugador.id }}" name="tipo_estudio" class="form-select" required>
+                    <option value="" disabled selected>Seleccionar Tipo</option>
+                    <option value="ORINA">Análisis de Orina</option>
+                    <option value="ELECTRO">Electrocardiograma</option>
+                    <option value="ERGOMETRIA">Ergometría</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="archivo_{{ jugador.id }}" class="form-label">Archivo</label>
+                <input type="file" id="archivo_{{ jugador.id }}" name="archivo" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="observaciones_{{ jugador.id }}" class="form-label">Observaciones</label>
+                <textarea id="observaciones_{{ jugador.id }}" name="observaciones" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Cargar Estudio Médico</button>
+        </form>
+    </div>
+</div>
 
                     <!-- Electro Basal -->
                     <div class="card mb-3">
