@@ -10,7 +10,7 @@ charset-normalizer ==       3.3.2
 click   ==                  8.1.7
 cmake   ==                  3.27.9
 colorama  ==                0.4.6
-colored     ==             2.2.3
+colored     ==             1.4.4
 comtypes      ==            1.2.0
 dill          ==            0.3.7
 distlib        ==           0.3.7
