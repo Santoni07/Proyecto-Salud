@@ -51,8 +51,16 @@
         
         <!-- Botón para regresar -->
         <div class="mt-3">
-            <p>Para volver al <strong>Menu</strong>, haz clic aquí:</p>
-            <a href="{% url 'menu_jugador' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
+            <p>Para volver al <strong>Menú</strong>, haz clic aquí:</p>
+            {% if profile.rol == 'jugador' %}
+                <a href="{% url 'menu_jugador' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
+            {% elif profile.rol == 'medico' %}
+                <a href="{% url 'medico_home' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
+            {% elif profile.rol == 'representante' %}
+                <a href="{% url 'representante_home' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
+            {% else %}
+                <a href="{% url 'menu_jugador' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
