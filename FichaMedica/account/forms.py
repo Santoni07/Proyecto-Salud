@@ -11,7 +11,10 @@ class LoginForm(forms.Form):
 class UserRegistrationForm(forms.ModelForm):
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Repite Contraseña', widget=forms.PasswordInput)
-
+    fecha_nacimiento = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label="Fecha de Nacimiento"
+    )
     class Meta:
         model = Profile  # Asegúrate de usar el modelo correcto aquí
         fields = ['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'email', 'password1', 'password2']

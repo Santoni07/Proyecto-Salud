@@ -65,18 +65,18 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Campo Fecha de Nacimiento -->
-                    <div class="form-group mt-3">
-                        {{ user_form.fecha_nacimiento.label_tag }}
-                        {% render_field user_form.fecha_nacimiento class+="form-control mt-2" %}
-                        {% if user_form.fecha_nacimiento.errors %}
-                            <div class="text-danger">
-                                {% for error in user_form.fecha_nacimiento.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                            <!-- Campo Fecha de Nacimiento -->
+            <div class="form-group mt-3">
+                {{ user_form.fecha_nacimiento.label_tag }}
+                {% render_field user_form.fecha_nacimiento class+="form-control mt-2" %}
+                {% if user_form.fecha_nacimiento.errors %}
+                    <div class="text-danger">
+                        {% for error in user_form.fecha_nacimiento.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
                     </div>
+                {% endif %}
+            </div>
                     
                     <!-- Campo Email -->
                     <div class="form-group mt-3">
