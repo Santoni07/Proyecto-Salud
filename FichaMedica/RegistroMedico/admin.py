@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import AntecedenteEnfermedades, EstudiosMedico, RegistroMedico
+from .models import *
 
 # Registro de AntecedenteEnfermedades en el admin
 @admin.register(AntecedenteEnfermedades)
@@ -23,17 +23,73 @@ class RegistroMedicoAdmin(admin.ModelAdmin):
     search_fields = ('idfichaMedica', 'jugador__nombre', 'torneo__nombre')
     list_filter = ('estado', 'torneo', 'fecha_creacion')
     # Agrega más filtros o campos de búsqueda según tu necesidad
-
+# Personalización de EstudiosMedico en el admin
 @admin.register(EstudiosMedico)
-class EstudioMedicoAdmin(admin.ModelAdmin):
-    list_display = ['ficha_medica', 'tipo_estudio', 'archivo_link']
-    search_fields = ['ficha_medica__jugador__nombre', 'ficha_medica__jugador__apellido', 'tipo_estudio']
-    list_filter = ['tipo_estudio']
+class EstudiosMedicoAdmin(admin.ModelAdmin):
+    list_display = ('idestudio', 'get_jugador', 'tipo_estudio', 'archivo', 'observaciones')
+    search_fields = ('idestudio', 'ficha_medica__jugador__persona__profile__nombre', 'tipo_estudio')
+    list_filter = ('tipo_estudio',)
 
-    def archivo_link(self, obj):
-        if obj.archivo:
-            return format_html('<a href="{}" target="_blank">Ver Archivo</a>', obj.archivo.url)
-        return "No disponible"
-    archivo_link.short_description = 'Archivo'
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'
 
-   
+# Personalización de ElectroBasal en el admin
+@admin.register(ElectroBasal)
+class ElectroBasalAdmin(admin.ModelAdmin):
+    list_display = ('idelectro_basal', 'get_jugador', 'ritmo', 'PQ', 'frecuencia', 'arritmias', 'ejeQRS', 'trazadoNormal', 'observaciones')
+    search_fields = ('idelectro_basal', 'ficha_medica__jugador__persona__profile__nombre')
+    
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'
+
+# Personalización de ElectroEsfuerzo en el admin
+@admin.register(ElectroEsfuerzo)
+class ElectroEsfuerzoAdmin(admin.ModelAdmin):
+    list_display = ('idelectro_esfuerzo', 'get_jugador', 'observaciones')
+    search_fields = ('idelectro_esfuerzo', 'ficha_medica__jugador__persona__profile__nombre')
+
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'
+
+# Personalización de Cardiovascular en el admin
+@admin.register(Cardiovascular)
+class CardiovascularAdmin(admin.ModelAdmin):
+    list_display = ('idcardiovascular', 'get_jugador', 'auscultacion', 'soplos', 'tension_arterial', 'ruidos_agregados', 'observaciones')
+    search_fields = ('idcardiovascular', 'ficha_medica__jugador__persona__profile__nombre')
+
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'
+
+# Personalización de Laboratorio en el admin
+@admin.register(Laboratorio)
+class LaboratorioAdmin(admin.ModelAdmin):
+    list_display = ('idlaboratorio', 'get_jugador', 'citologico', 'orina', 'colesterol', 'uremia', 'glucemia', 'otros')
+    search_fields = ('idlaboratorio', 'ficha_medica__jugador__persona__profile__nombre')
+
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'
+
+# Personalización de Torax en el admin
+@admin.register(Torax)
+class ToraxAdmin(admin.ModelAdmin):
+    list_display = ('idtorax', 'get_jugador', 'observaciones')
+    search_fields = ('idtorax', 'ficha_medica__jugador__persona__profile__nombre')
+
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'
+
+# Personalización de Oftalmologico en el admin
+@admin.register(Oftalmologico)
+class OftalmologicoAdmin(admin.ModelAdmin):
+    list_display = ('idoftalmologico', 'get_jugador', 'od', 'oi')
+    search_fields = ('idoftalmologico', 'ficha_medica__jugador__persona__profile__nombre')
+
+    def get_jugador(self, obj):
+        return f"{obj.ficha_medica.jugador.persona.profile.nombre} {obj.ficha_medica.jugador.persona.profile.apellido}"
+    get_jugador.short_description = 'Jugador'

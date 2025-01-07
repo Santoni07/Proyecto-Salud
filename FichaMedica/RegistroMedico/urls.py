@@ -13,5 +13,6 @@ urlpatterns = [
     path('cargar_estudio/<int:ficha_id>/', CargarEstudioView.as_view(), name='cargar_estudio'),
     path('ficha/<int:ficha_medica_id>/estudios/', EstudiosMedicoListView.as_view(), name='ver_estudios'),
     path('estudio/<int:pk>/eliminar/', EliminarEstudioView.as_view(), name='eliminar_estudio'),  
+    path('estudio/<int:pk>/eliminar/medico/', EliminarEstudioMedicoView.as_view(), name='eliminar_estudio_medico'),
     
 ]

@@ -43,12 +43,34 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'publicidad',
     'persona',
+    'Medico',
+  
+    'Representate',
    
     'RegistroMedico',
   
     
    
 ]
+# Configuración de sitio
+SITE_ID = 1
+
+
+# Configuracion del servidor para el email
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')  # Carpeta donde se guardarán los correos
+else:
+    # Configuración para producción
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'tu_email@gmail.com'
+    EMAIL_HOST_PASSWORD = 'tu_contraseña'
+    DEFAULT_FROM_EMAIL = 'tu_email@gmail.com'
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'FichaMedica.middleware.disable_cache.DisableCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'FichaMedica.urls'

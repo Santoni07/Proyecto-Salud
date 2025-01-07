@@ -8,11 +8,13 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),  # Cambia esto según tu vista principal
+    path('', views.home, name='home'),
     path('account/', include('account.urls')),
     path('persona/', include('persona.urls')),
  
     path('registro-medico/', include('RegistroMedico.urls')), 
+    path('medico/', include('Medico.urls')),
+    path('Representate/', include('Representate.urls')),
    
     
 ]
